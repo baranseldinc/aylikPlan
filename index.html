@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Firmacılar</h3>
+
+                            <ul>
+                                <li>Nur</li>
+                                <li>Hande</li>
+                                <li>Cansu</li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Çelimsizler</h3>
+
+                            <ul>
+                                <li>Yusuf</li>
+                                <li>Baransel</li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Halay Başları</h3>
+
+                            <ul>
+                                <li>Oğuzhan</li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Tuzu Kurular</h3>
+
+                            <ul>
+                                <li>Betül</li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                Önümüzde ki
+                <input type="number" id="numOfWeek" value="5" style="width: 40px;">
+                hafta için
+                <input type="submit" class="btn btn-danger" value="Çek Ayarı" onclick="ayar()">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Hafta</th>
+                                <th scope="col">Tarihler</th>
+                                <th scope="col">Gelecek Kurbanlar</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id='data'>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var aylar = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+        var celimsizler = ['Yusuf', 'Baransel', 'null'];
+
+        var firmacilar = ['Nur', 'Hande', 'Cansu'];
+
+        var halayBaslari = ['Oğuzhan', 'null', 'null'];
+
+        function satir(sira, xtarih, kurbanlar) {
+            var tarih = new Date(xtarih);
+            this.sira = sira;
+            this.tarih = tarih;
+            this.kurbanlar = kurbanlar;
+
+            this.getSira = function () {
+                return this.sira + '. hafta';
+            }
+
+            this.getTarihler = function () {
+                var bir = tarih.getDate();
+                tarih.setDate(tarih.getDate() + 1);
+                var iki = tarih.getDate();
+                tarih.setDate(tarih.getDate() + 1);
+                var uc = tarih.getDate();
+                tarih.setDate(tarih.getDate() + 1);
+                var dort = tarih.getDate();
+                tarih.setDate(tarih.getDate() + 1);
+                var bes = tarih.getDate();
+
+                return bir + '/' + iki + '/' + uc + '/' + dort + '/' + bes + ' ' + aylar[tarih.getMonth()] + ' ' + tarih.getFullYear();
+            }
+
+            this.getKurbanlar = function () {
+                return kurbanlar.join(' - ');
+            }
+        }
+
+        function ayar() {
+            var start = new Date();
+            while (start.getDay() !== 1) { debugger; start.setDate(start.getDate() + 1); }
+            start.setDate(start.getDate() - 7);
+            var numOfWeek = document.getElementById('numOfWeek').value;
+            var data = [];
+            if (numOfWeek) {
+
+                numOfWeek = parseInt(numOfWeek);
+                for (var h = 0; h < numOfWeek; h++) {
+                    if (h % 3 == 0) {
+                        shuffle(halayBaslari);
+                        shuffle(celimsizler);
+                        shuffle(firmacilar);
+                    }
+                    start.setDate(start.getDate() + 7);
+                    var kurbanlar = [];
+                    var halayKurbani = halayBaslari[h % halayBaslari.length];
+                    var firmaKurbani = firmacilar[h % firmacilar.length];
+                    var celimsiz = celimsizler[h % celimsizler.length];
+                    if (halayKurbani != 'null') kurbanlar.push(halayKurbani);
+                    if (firmaKurbani != 'null') kurbanlar.push(firmaKurbani);
+                    if (celimsiz != 'null') kurbanlar.push(celimsiz);
+                    data.push(new satir(h + 1, start, kurbanlar));
+                }
+                satirlariYaz(data);
+            } else {
+                alert('Bir rakam girecen da');
+            }
+        }
+
+        function satirlariYaz(data) {
+            var html = '';
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                html += `<tr>
+                    <th scope="row">${d.getSira()}</th>
+                    <td>${d.getTarihler()}</td>
+                    <td>${d.getKurbanlar()}</td>
+                </tr>`;
+            }
+            document.getElementById('data').innerHTML = html;
+        }
+
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+    </script>
+</body>
+
+</html>
